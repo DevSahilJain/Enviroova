@@ -10,6 +10,9 @@ import {
 import { formatKwh, formatSigned, formatTimeRange } from '@/lib/ecoloop/format'
 import { computeSustainabilityConfidenceScore } from '@/lib/ecoloop/confidence-score'
 import type { Anomaly, AnomalySeverity, ConfidenceLabel } from '@/lib/ecoloop/types'
+import { ChevronDown, SearchCheck } from 'lucide-react'
+import { formatKwh, formatSigned, formatTimeRange } from '@/lib/ecoloop/format'
+import type { Anomaly, AnomalySeverity } from '@/lib/ecoloop/types'
 import { cn } from '@/lib/utils'
 import { Panel } from './panel'
 import { NoDataState } from './states'
@@ -292,6 +295,10 @@ export function AnomalyPanel({
                       <p className="mb-2 text-[11px] text-muted-foreground italic">
                         {confidence.causalityNotice}
                       </p>
+                    <div>
+                      <h3 className="mb-2 font-semibold">
+                        Possible root causes
+                      </h3>
                       <ol className="space-y-3">
                         {a.hypotheses.map((h) => {
                           const pct = Math.round(h.confidence * 100)

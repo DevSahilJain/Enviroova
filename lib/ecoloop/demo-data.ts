@@ -296,6 +296,18 @@ function buildAnomalies(series: EnergyPoint[]): Anomaly[] {
       evidence,
       hypotheses: a.hypotheses,
       confidenceScore,
+    return {
+      id: a.id,
+      title: a.title,
+      startTimestamp: window[0].timestamp,
+      endTimestamp: window[window.length - 1].timestamp,
+      severity: a.severity,
+      peakDeviationKwh: round(peak),
+      meanDeviationKwh: round(meanDev),
+      meanDeviationPct: round((excess / expectedSum) * 100),
+      excessKwh: round(excess),
+      evidence,
+      hypotheses: a.hypotheses,
     }
   })
 }
