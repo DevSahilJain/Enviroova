@@ -10,6 +10,7 @@ import type {
 } from '@/lib/ecoloop/types'
 import { useEnergyData } from '@/lib/ecoloop/use-energy-data'
 import { AnomalyPanel } from './anomaly-panel'
+import { CampusDigitalTwinMap } from './digital-twin-map'
 import { DemoBanner } from './demo-banner'
 import { EnergyChart } from './energy-chart'
 import { KpiCards } from './kpi-cards'
@@ -61,6 +62,7 @@ function DashboardContent({ dataset }: { dataset: EnergyDataset }) {
           onLoadConfig={setConfig}
         />
       </div>
+      <CampusDigitalTwinMap />
       <p className="text-xs text-muted-foreground">
         Simulation is a screening-level estimate. Assumptions: $
         {dataset.meta.assumptions.tariffPerKwh.toFixed(2)}/kWh,{' '}
