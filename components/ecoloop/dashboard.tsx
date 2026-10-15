@@ -43,6 +43,7 @@ function DashboardContent({ dataset }: { dataset: EnergyDataset }) {
             anomalies={dataset.anomalies}
             simulation={simulation}
             selectedAnomalyId={selectedAnomalyId}
+            isSynthetic={dataset.meta.isSynthetic}
           />
         </div>
         <AnomalyPanel
@@ -73,7 +74,11 @@ function DashboardContent({ dataset }: { dataset: EnergyDataset }) {
 
 export function Dashboard() {
   const [scenario, setScenario] = useState<DemoScenario>('normal')
-  const { data, error, isLoading, mutate } = useEnergyData(scenario)
+  const [source, setSource] = useState<'demo' | 'database'>('database')
+  const { data, error, isLoading, mutate } = useEnergyData(
+    scenario,
+    source,
+  )
 
   let body: React.ReactNode
   if (isLoading) {
@@ -117,18 +122,33 @@ export function Dashboard() {
               </p>
             </div>
           </div>
-          {data && data.series.length > 0 ? (
-            <p className="text-xs text-muted-foreground">
-              {data.meta.siteName} &middot;{' '}
-              <time dateTime={data.meta.periodStart}>
-                {formatDay(data.meta.periodStart)}
-              </time>{' '}
-              to{' '}
-              <time dateTime={data.meta.periodEnd}>
-                {formatDay(data.meta.periodEnd)}
-              </time>
-            </p>
-          ) : null}
+          <div className="flex flex-wrap items-center gap-4">
+            <label className="flex items-center gap-2 text-sm">
+              <span className="text-muted-foreground">Data source</span>
+              <select
+                value={source}
+                onChange={(event) =>
+                  setSource(event.target.value as 'demo' | 'database')
+                }
+                className="rounded-md border bg-background px-3 py-2"
+              >
+                <option value="database">Imported readings</option>
+                <option value="demo">Demo data</option>
+              </select>
+            </label>
+            {data && data.series.length > 0 ? (
+              <p className="text-xs text-muted-foreground">
+                {data.meta.siteName} &middot;{' '}
+                <time dateTime={data.meta.periodStart}>
+                  {formatDay(data.meta.periodStart)}
+                </time>{' '}
+                to{' '}
+                <time dateTime={data.meta.periodEnd}>
+                  {formatDay(data.meta.periodEnd)}
+                </time>
+              </p>
+            ) : null}
+          </div>
         </div>
       </header>
       <main className="mx-auto max-w-[1440px] px-4 py-6 sm:px-6">{body}</main>

@@ -27,6 +27,7 @@ interface EnergyChartProps {
   anomalies: Anomaly[]
   simulation: SimulationResult
   selectedAnomalyId: string | null
+  isSynthetic: boolean
 }
 
 interface ChartRow {
@@ -112,11 +113,12 @@ export function EnergyChart({
   anomalies,
   simulation,
   selectedAnomalyId,
+  isSynthetic,
 }: EnergyChartProps) {
   const [view, setView] = useState<'chart' | 'table'>('chart')
   const [showSimulated, setShowSimulated] = useState(true)
   const hasSimulation = simulation.totals.savingsKwh > 0.5
-  const showPredicted = showSimulated && hasSimulation
+  const showPredicted = isSynthetic && showSimulated && hasSimulation
 
   const data = useMemo<ChartRow[]>(
     () =>
@@ -153,12 +155,17 @@ export function EnergyChart({
     [data],
   )
 
-  const summary = `Hourly energy use over 7 days in kWh, comparing expected and actual consumption. ${anomalies.length} anomalous windows are shaded.`
-
+  const summary = isSynthetic
+    ? `Hourly energy use over 7 days in kWh, comparing expected and actual consumption. ${anomalies.length} anomalous windows are shaded.`
+    : `Imported energy readings in kWh. Expected baseline and anomaly analysis are not available for this dataset.`
   return (
     <Panel
       title="Energy consumption"
-      description="Expected versus actual hourly usage (kWh), 7 days, UTC"
+      description={
+        isSynthetic
+          ? 'Expected versus actual hourly usage (kWh), 7 days, UTC'
+          : 'Imported meter readings (kWh), UTC — no baseline available'
+      }
       actions={
         <div
           role="group"
@@ -187,11 +194,13 @@ export function EnergyChart({
       {view === 'chart' ? (
         <>
           <ul className="mb-3 flex flex-wrap items-center gap-x-5 gap-y-1 text-xs">
-            <LegendItem
-              label="Expected"
-              color="var(--muted-foreground)"
-              dash="5 4"
-            />
+            {isSynthetic ? (
+              <LegendItem
+                label="Expected"
+                color="var(--muted-foreground)"
+                dash="5 4"
+              />
+            ) : null}
             <LegendItem label="Actual" color="var(--chart-1)" />
             {showPredicted ? (
               <LegendItem
@@ -286,16 +295,18 @@ export function EnergyChart({
                     />
                   )
                 })}
-                <Line
-                  dataKey="expected"
-                  name="Expected"
-                  stroke="var(--muted-foreground)"
-                  strokeWidth={1.75}
-                  strokeDasharray="5 4"
-                  dot={false}
-                  activeDot={false}
-                  isAnimationActive={false}
-                />
+                {isSynthetic ? (
+                  <Line
+                    dataKey="expected"
+                    name="Expected"
+                    stroke="var(--muted-foreground)"
+                    strokeWidth={1.75}
+                    strokeDasharray="5 4"
+                    dot={false}
+                    activeDot={false}
+                    isAnimationActive={false}
+                  />
+                ) : null}
                 {showPredicted ? (
                   <Line
                     dataKey="predicted"
@@ -333,15 +344,19 @@ export function EnergyChart({
                 <th scope="col" className="py-2 pr-4 font-medium">
                   Day (UTC)
                 </th>
+                {isSynthetic ? (
+                  <th scope="col" className="py-2 pr-4 text-right font-medium">
+                    Expected
+                  </th>
+                ) : null}
                 <th scope="col" className="py-2 pr-4 text-right font-medium">
-                  Expected
+                  Actual (kWh)
                 </th>
-                <th scope="col" className="py-2 pr-4 text-right font-medium">
-                  Actual
-                </th>
-                <th scope="col" className="py-2 text-right font-medium">
-                  Simulated
-                </th>
+                {isSynthetic ? (
+                  <th scope="col" className="py-2 text-right font-medium">
+                    Simulated
+                  </th>
+                ) : null}
               </tr>
             </thead>
             <tbody>
@@ -350,15 +365,19 @@ export function EnergyChart({
                   <th scope="row" className="py-2 pr-4 text-left font-normal">
                     {formatDay(`${d.key}T00:00:00Z`)}
                   </th>
-                  <td className="py-2 pr-4 text-right">
-                    {formatKwh(d.expected)}
-                  </td>
+                  {isSynthetic ? (
+                    <td className="py-2 pr-4 text-right">
+                      {formatKwh(d.expected)}
+                    </td>
+                  ) : null}
                   <td className="py-2 pr-4 text-right">
                     {formatKwh(d.actual)}
                   </td>
-                  <td className="py-2 text-right">
-                    {formatKwh(d.predicted)}
-                  </td>
+                  {isSynthetic ? (
+                    <td className="py-2 text-right">
+                      {formatKwh(d.predicted)}
+                    </td>
+                  ) : null}
                 </tr>
               ))}
             </tbody>
