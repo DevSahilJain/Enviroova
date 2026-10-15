@@ -1,0 +1,111 @@
+{
+  "project": "ECOLOOP",
+  "dataset_classification": "SIMULATED_DEMO_DATA",
+  "is_simulated": true,
+  "disclaimer": "CRITICAL NOTICE: All values, baselines, and telemetry entries are 100% synthetically modeled for the ECOLOOP hackathon prototype. No actual campus or DSU facility measurements are represented.",
+  "target_building": {
+    "building_id": "BUILDING_A",
+    "building_name": "Science & Engineering Hall (Fictional)",
+    "gross_area_sqft": 45000,
+    "primary_use": "Academic Classrooms, Computer Labs, Faculty Offices",
+    "utility_tariff_per_kwh_usd": 0.12,
+    "grid_emissions_factor_kg_co2e_per_kwh": 0.385
+  },
+  "interventions": [
+    {
+      "id": "INT-01",
+      "name": "Automated HVAC Scheduling & Unoccupied Temperature Setback",
+      "subsystem": "HVAC",
+      "target_equipment": "AHU-1, VAV Terminal Boxes, Chilled Water Pump Loop",
+      "implementation_details": "Automated BMS schedule programmed with 21:00-06:00 night setback (cooling setpoint relaxed from 21.0°C to 27.5°C; heating setpoint lowered to 15.5°C). AHU variable frequency drive (VFD) supply fan speed clamped to 20% minimum ventilation rate during unoccupied hours. Local digital wall thermostat overrides restricted to maximum 90-minute auto-reset timer.",
+      "operational_parameters": {
+        "schedule": "Weekdays 21:00 - 06:00, Weekends 18:00 - 08:00",
+        "cooling_setback_c": 27.5,
+        "heating_setback_c": 15.5,
+        "minimum_cfm_pct": 20
+      },
+      "pre_intervention_baseline_weekly_kwh": 5820.0,
+      "predicted_savings_kwh": 2210.0,
+      "predicted_savings_pct": 38.0,
+      "observed_savings_kwh": 2168.4,
+      "observed_savings_pct": 37.3,
+      "variance_kwh": -41.6,
+      "variance_pct": -1.88,
+      "avoided_emissions_kg_co2e": 834.8,
+      "cost_savings_usd": 260.21
+    },
+    {
+      "id": "INT-02",
+      "name": "PIR Occupancy-Based Lighting Sweeps & Daylight Dimming",
+      "subsystem": "LIGHTING",
+      "target_equipment": "Atrium High-Bays, Common Area Corridors, Classroom Circuits",
+      "implementation_details": "Commissioning of dual-technology Passive Infrared (PIR) and Ultrasonic vacancy sensors with 15-minute auto-off timeout across all lecture halls and classrooms. Automated DALI/0-10V controller sweeps all non-emergency lighting off at 20:30 daily. Daylight harvesting photo-sensors installed along South and East perimeter glazing zones to dynamically dim ambient fixtures by up to 60% during sunny hours.",
+      "operational_parameters": {
+        "auto_off_timeout_minutes": 15,
+        "nightly_sweep_time": "20:30 local",
+        "daylight_dimming_max_pct": 60,
+        "custodial_manual_override_timeout_minutes": 60
+      },
+      "pre_intervention_baseline_weekly_kwh": 2940.0,
+      "predicted_savings_kwh": 1350.0,
+      "predicted_savings_pct": 45.9,
+      "observed_savings_kwh": 1318.2,
+      "observed_savings_pct": 44.8,
+      "variance_kwh": -31.8,
+      "variance_pct": -2.36,
+      "avoided_emissions_kg_co2e": 507.5,
+      "cost_savings_usd": 158.18
+    },
+    {
+      "id": "INT-03",
+      "name": "Centralized Lab Workstation Power Policy & Smart Plug-Load Strip Shutdown",
+      "subsystem": "PLUG_LOAD",
+      "target_equipment": "Computer Lab 202 Workstations, Maker Studio Peripherals, Faculty Office Electronics",
+      "implementation_details": "Campus Active Directory Group Policy Object (GPO) deployed across all 40 engineering lab workstations enforcing S3 low-power sleep after 15 minutes of user inactivity. Installation of scheduled smart relay power distribution strips cutting 100% of phantom/vampire standby draw to peripheral electronics, soldering stations, and 3D printer heated beds between 20:00 and 07:00 daily.",
+      "operational_parameters": {
+        "idle_sleep_timeout_minutes": 15,
+        "smart_strip_scheduled_cutoff": "20:00 local",
+        "smart_strip_morning_restore": "07:00 local",
+        "wake_on_lan_maintenance_window": "03:00 - 04:00 Tuesday only"
+      },
+      "pre_intervention_baseline_weekly_kwh": 3180.0,
+      "predicted_savings_kwh": 1520.0,
+      "predicted_savings_pct": 47.8,
+      "observed_savings_kwh": 1482.6,
+      "observed_savings_pct": 46.6,
+      "variance_kwh": -37.4,
+      "variance_pct": -2.46,
+      "avoided_emissions_kg_co2e": 570.8,
+      "cost_savings_usd": 177.91
+    }
+  ],
+  "before_and_after_comparison": {
+    "measurement_and_verification_standard": "IPMVP Option C (Whole Facility Energy Model)",
+    "pre_intervention_period": {
+      "dates": "2026-10-01 to 2026-10-07 (7 Days / 168 Hours)",
+      "baseline_expected_kwh": 11940.0,
+      "actual_observed_kwh": 12792.4,
+      "anomalous_waste_kwh": 852.4,
+      "operational_state": "Un-optimized legacy schedules with 3 major uncorrected anomalies"
+    },
+    "post_intervention_period": {
+      "dates": "2026-10-08 to 2026-10-14 (7 Days / 168 Hours)",
+      "historical_unoptimized_baseline_kwh": 11940.0,
+      "predicted_consumption_kwh": 6860.0,
+      "actual_observed_kwh": 6970.8,
+      "operational_state": "All 3 automated ECOLOOP interventions active"
+    },
+    "impact_metrics": {
+      "total_predicted_savings_kwh": 5080.0,
+      "total_predicted_savings_pct": 42.55,
+      "total_observed_savings_kwh": 4969.2,
+      "total_observed_savings_pct": 41.62,
+      "model_prediction_variance_kwh": -110.8,
+      "model_accuracy_pct": 97.82,
+      "total_avoided_emissions_kg_co2e": 1913.1,
+      "total_financial_savings_usd": 596.30,
+      "annualized_projected_savings_usd": 31007.60,
+      "annualized_projected_emissions_reduction_mt_co2e": 99.48
+    }
+  }
+}

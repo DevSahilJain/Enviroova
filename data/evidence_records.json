@@ -1,0 +1,248 @@
+{
+  "metadata": {
+    "project": "ECOLOOP - Campus Energy Intelligence & Decarbonization",
+    "dataset_name": "Linked Evidence Records for Building A Energy Anomalies",
+    "dataset_version": "1.1.0",
+    "data_classification": "SIMULATED_DEMO_DATA",
+    "disclaimer": "CRITICAL NOTICE: All telemetry records, device IDs, meter logs, and register states are 100% synthetically generated for the ECOLOOP hackathon prototype. No real campus or DSU facility measurements are represented.",
+    "total_evidence_records": 13,
+    "anomalies_covered": ["ANOM-01", "ANOM-02", "ANOM-03"],
+    "epistemic_standard": "Strict separation of observed facts from hypotheses and recommendations; correlation is explicitly distinguished from proof of cause."
+  },
+  "evidence_records": [
+    {
+      "evidence_id": "EVID-ANOM-01-01",
+      "anomaly_id": "ANOM-01",
+      "reporting_period": {
+        "start_time": "2026-10-02T23:00:00Z",
+        "end_time": "2026-10-03T05:00:00Z",
+        "interval": "HOURLY"
+      },
+      "source_system": "BMS_BACNET",
+      "source_device_id": "BLDG_A.AHU1.FAN_CMD",
+      "parameter": "VFD Supply Fan Speed Command",
+      "observed_value": 100.0,
+      "expected_baseline_value": 0.0,
+      "unit": "%",
+      "factual_observation": "AHU-1 VFD supply fan commanded to 100% full capacity continuously for 7 consecutive hours during scheduled building closure.",
+      "is_simulated": true,
+      "data_classification": "SIMULATED_DEMO_DATA"
+    },
+    {
+      "evidence_id": "EVID-ANOM-01-02",
+      "anomaly_id": "ANOM-01",
+      "reporting_period": {
+        "start_time": "2026-10-02T23:00:00Z",
+        "end_time": "2026-10-03T05:00:00Z",
+        "interval": "HOURLY"
+      },
+      "source_system": "SMART_SUBMETER",
+      "source_device_id": "MTR-HVAC-01",
+      "parameter": "Subsystem Real Power Load",
+      "observed_value": 91.8,
+      "expected_baseline_value": 29.8,
+      "unit": "kW",
+      "factual_observation": "HVAC sub-meter logged steady load between 90.2 kW and 93.8 kW throughout the night, exceeding baseline expectation by ~62.0 kW.",
+      "is_simulated": true,
+      "data_classification": "SIMULATED_DEMO_DATA"
+    },
+    {
+      "evidence_id": "EVID-ANOM-01-03",
+      "anomaly_id": "ANOM-01",
+      "reporting_period": {
+        "start_time": "2026-10-02T23:00:00Z",
+        "end_time": "2026-10-03T05:00:00Z",
+        "interval": "HOURLY"
+      },
+      "source_system": "BMS_BACNET",
+      "source_device_id": "TH-101",
+      "parameter": "Thermostat Override Status & Cooling Setpoint",
+      "observed_value": "OVERRIDE_ACTIVE=TRUE; Setpoint=18.0",
+      "expected_baseline_value": "OVERRIDE_ACTIVE=FALSE; Setpoint=24.0",
+      "unit": "state / °C",
+      "factual_observation": "Digital wall thermostat in Lecture Hall 101 recorded override active flag with setpoint set to 18.0°C.",
+      "is_simulated": true,
+      "data_classification": "SIMULATED_DEMO_DATA"
+    },
+    {
+      "evidence_id": "EVID-ANOM-01-04",
+      "anomaly_id": "ANOM-01",
+      "reporting_period": {
+        "start_time": "2026-10-02T23:00:00Z",
+        "end_time": "2026-10-03T05:00:00Z",
+        "interval": "HOURLY"
+      },
+      "source_system": "BMS_BACNET",
+      "source_device_id": "PMP-CHW-02",
+      "parameter": "Chilled Water Primary Pump Status & Loop Delta-T",
+      "observed_value": "RUNNING_100%; DeltaT=5.8",
+      "expected_baseline_value": "STANDBY_0%; DeltaT=0.0",
+      "unit": "state / °C",
+      "factual_observation": "Primary chilled water loop pump PMP-CHW-02 ran at 100% duty with continuous 5.8°C thermal differential indicating active heat extraction.",
+      "is_simulated": true,
+      "data_classification": "SIMULATED_DEMO_DATA"
+    },
+    {
+      "evidence_id": "EVID-ANOM-01-05",
+      "anomaly_id": "ANOM-01",
+      "reporting_period": {
+        "start_time": "2026-10-02T23:00:00Z",
+        "end_time": "2026-10-03T05:00:00Z",
+        "interval": "HOURLY"
+      },
+      "source_system": "WEATHER_STATION_EXT",
+      "source_device_id": "WS-CAMPUS-01",
+      "parameter": "Outdoor Dry-Bulb Temperature",
+      "observed_value": 13.5,
+      "expected_baseline_value": 13.5,
+      "unit": "°C",
+      "factual_observation": "Ambient outdoor dry-bulb temperature ranged between 11.9°C and 14.3°C, indicating that active mechanical chiller refrigeration was not environmentally required.",
+      "is_simulated": true,
+      "data_classification": "SIMULATED_DEMO_DATA"
+    },
+    {
+      "evidence_id": "EVID-ANOM-02-01",
+      "anomaly_id": "ANOM-02",
+      "reporting_period": {
+        "start_time": "2026-10-04T01:00:00Z",
+        "end_time": "2026-10-04T07:00:00Z",
+        "interval": "HOURLY"
+      },
+      "source_system": "LIGHTING_RELAY_PANEL",
+      "source_device_id": "LCP-03",
+      "parameter": "Panel Master Switch & Relay States",
+      "observed_value": "CLOSED_MANUAL (Relays 1-12)",
+      "expected_baseline_value": "OPEN_SCHEDULED (Relays 1-12)",
+      "unit": "state",
+      "factual_observation": "Lighting relay panel LCP-03 recorded master keyed override switch engaged, maintaining high-bay branch circuits closed.",
+      "is_simulated": true,
+      "data_classification": "SIMULATED_DEMO_DATA"
+    },
+    {
+      "evidence_id": "EVID-ANOM-02-02",
+      "anomaly_id": "ANOM-02",
+      "reporting_period": {
+        "start_time": "2026-10-04T01:00:00Z",
+        "end_time": "2026-10-04T07:00:00Z",
+        "interval": "HOURLY"
+      },
+      "source_system": "SMART_SUBMETER",
+      "source_device_id": "MTR-LTG-PNL3",
+      "parameter": "Lighting Branch Active Power",
+      "observed_value": 22.8,
+      "expected_baseline_value": 1.2,
+      "unit": "kW",
+      "factual_observation": "Dedicated lighting sub-meter registered steady 22.8 kW draw throughout Sunday early morning (typical unoccupied baseline is <1.5 kW).",
+      "is_simulated": true,
+      "data_classification": "SIMULATED_DEMO_DATA"
+    },
+    {
+      "evidence_id": "EVID-ANOM-02-03",
+      "anomaly_id": "ANOM-02",
+      "reporting_period": {
+        "start_time": "2026-10-04T01:00:00Z",
+        "end_time": "2026-10-04T07:00:00Z",
+        "interval": "HOURLY"
+      },
+      "source_system": "IOT_OCCUPANCY_SENSOR",
+      "source_device_id": "PIR-ATR-01_THRU_04",
+      "parameter": "PIR Motion Detection Events",
+      "observed_value": 0,
+      "expected_baseline_value": 0,
+      "unit": "events/hr",
+      "factual_observation": "Ceiling passive infrared sensors across Zone 3 recorded zero motion triggers over the 7-hour period.",
+      "is_simulated": true,
+      "data_classification": "SIMULATED_DEMO_DATA"
+    },
+    {
+      "evidence_id": "EVID-ANOM-02-04",
+      "anomaly_id": "ANOM-02",
+      "reporting_period": {
+        "start_time": "2026-10-04T01:00:00Z",
+        "end_time": "2026-10-04T07:00:00Z",
+        "interval": "HOURLY"
+      },
+      "source_system": "ACCESS_CONTROL",
+      "source_device_id": "ACS-BLDGA-MAIN",
+      "parameter": "Building Perimeter Security Status",
+      "observed_value": "PERIMETER_ARMED; 0_ENTRIES",
+      "expected_baseline_value": "PERIMETER_ARMED; 0_ENTRIES",
+      "unit": "state",
+      "factual_observation": "Campus electronic access control reported Building A main and secondary portals remained armed and locked, with zero badge swipes between 22:30 Saturday and 07:30 Sunday.",
+      "is_simulated": true,
+      "data_classification": "SIMULATED_DEMO_DATA"
+    },
+    {
+      "evidence_id": "EVID-ANOM-03-01",
+      "anomaly_id": "ANOM-03",
+      "reporting_period": {
+        "start_time": "2026-10-05T20:00:00Z",
+        "end_time": "2026-10-06T04:00:00Z",
+        "interval": "HOURLY"
+      },
+      "source_system": "SMART_SUBMETER",
+      "source_device_id": "MTR-PLUG-R202",
+      "parameter": "Lab 202 Distribution Panel Active Power",
+      "observed_value": 28.5,
+      "expected_baseline_value": 3.2,
+      "unit": "kW",
+      "factual_observation": "Dedicated sub-panel for CAD Lab 202 registered continuous 28.5 kW active power draw overnight from 20:00 to 04:00.",
+      "is_simulated": true,
+      "data_classification": "SIMULATED_DEMO_DATA"
+    },
+    {
+      "evidence_id": "EVID-ANOM-03-02",
+      "anomaly_id": "ANOM-03",
+      "reporting_period": {
+        "start_time": "2026-10-05T20:00:00Z",
+        "end_time": "2026-10-06T04:00:00Z",
+        "interval": "HOURLY"
+      },
+      "source_system": "ACTIVE_DIRECTORY",
+      "source_device_id": "DC-CAMPUS-01",
+      "parameter": "Authenticated Interactive User Sessions",
+      "observed_value": 0,
+      "expected_baseline_value": 0,
+      "unit": "sessions",
+      "factual_observation": "Domain controller recorded zero active user logon sessions across all 40 Room 202 workstations after 19:45.",
+      "is_simulated": true,
+      "data_classification": "SIMULATED_DEMO_DATA"
+    },
+    {
+      "evidence_id": "EVID-ANOM-03-03",
+      "anomaly_id": "ANOM-03",
+      "reporting_period": {
+        "start_time": "2026-10-05T20:00:00Z",
+        "end_time": "2026-10-06T04:00:00Z",
+        "interval": "HOURLY"
+      },
+      "source_system": "NETWORK_SWITCH_SNMP",
+      "source_device_id": "SW-R202-01",
+      "parameter": "Ethernet Port Link Status & Traffic Rate",
+      "observed_value": "40_PORTS_UP_1GBPS; 1.2_MBPS_TX_RX",
+      "expected_baseline_value": "40_PORTS_DOWN_OR_SLEEP",
+      "unit": "ports / Mbps",
+      "factual_observation": "Managed network switch reported all 40 host ports operating at full 1 Gbps link rate with steady background network keep-alive traffic (~1.2 Mbps).",
+      "is_simulated": true,
+      "data_classification": "SIMULATED_DEMO_DATA"
+    },
+    {
+      "evidence_id": "EVID-ANOM-03-04",
+      "anomaly_id": "ANOM-03",
+      "reporting_period": {
+        "start_time": "2026-10-05T20:00:00Z",
+        "end_time": "2026-10-06T04:00:00Z",
+        "interval": "HOURLY"
+      },
+      "source_system": "IOT_SMART_PDU",
+      "source_device_id": "PDU-3DPRN-01",
+      "parameter": "Makerspace Peripheral Power & Standby Heat",
+      "observed_value": "1050_W; BedTemp=60.0",
+      "expected_baseline_value": "0_W; BedTemp=21.0",
+      "unit": "W / °C",
+      "factual_observation": "Smart PDU logging revealed three 3D printer heated beds remained energized at 60.0°C standby with 0 queued or executing print jobs.",
+      "is_simulated": true,
+      "data_classification": "SIMULATED_DEMO_DATA"
+    }
+  ]
+}
