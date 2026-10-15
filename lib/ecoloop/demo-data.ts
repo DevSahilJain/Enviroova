@@ -1,3 +1,4 @@
+import { computeSustainabilityConfidenceScore } from './confidence-score'
 import { DEFAULT_ASSUMPTIONS, DISABLED_CONFIG, simulate } from './simulation'
 import type {
   Anomaly,
@@ -259,18 +260,42 @@ function buildAnomalies(series: EnergyPoint[]): Anomaly[] {
       ...a.extraEvidence,
     ]
 
+    const peakRounded = round(peak)
+    const meanDevRounded = round(meanDev)
+    const meanDevPctRounded = round((excess / expectedSum) * 100)
+    const excessRounded = round(excess)
+    const startTimestamp = window[0].timestamp
+    const endTimestamp = window[window.length - 1].timestamp
+
+    const confidenceScore = computeSustainabilityConfidenceScore({
+      id: a.id,
+      title: a.title,
+      startTimestamp,
+      endTimestamp,
+      peakDeviationKwh: peakRounded,
+      meanDeviationKwh: meanDevRounded,
+      meanDeviationPct: meanDevPctRounded,
+      excessKwh: excessRounded,
+      evidence,
+      hypotheses: a.hypotheses,
+      seriesPoints: window,
+      referenceTimestamp: series[series.length - 1]?.timestamp,
+      isSimulated: true,
+    })
+
     return {
       id: a.id,
       title: a.title,
-      startTimestamp: window[0].timestamp,
-      endTimestamp: window[window.length - 1].timestamp,
+      startTimestamp,
+      endTimestamp,
       severity: a.severity,
-      peakDeviationKwh: round(peak),
-      meanDeviationKwh: round(meanDev),
-      meanDeviationPct: round((excess / expectedSum) * 100),
-      excessKwh: round(excess),
+      peakDeviationKwh: peakRounded,
+      meanDeviationKwh: meanDevRounded,
+      meanDeviationPct: meanDevPctRounded,
+      excessKwh: excessRounded,
       evidence,
       hypotheses: a.hypotheses,
+      confidenceScore,
     }
   })
 }
