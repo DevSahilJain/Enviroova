@@ -24,3 +24,11 @@ node_modules
 .DS_Store
 # Generated Next.js type references
 next-env.d.ts
+# Generated build artifacts
+dist/
+*.tsbuildinfo
+
+# Local backup files
+*.backup
+*.local-backup
+*.error-backup

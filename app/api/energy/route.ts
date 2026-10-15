@@ -20,7 +20,9 @@ export async function GET(request: Request) {
   if (scenario === 'slow') {
     await new Promise((resolve) => setTimeout(resolve, 2500))
   }
-  return Response.json(
-    scenario === 'empty' ? getEmptyDataset() : getDemoDataset(),
-  )
+  if (scenario === 'empty') {
+    return Response.json(getEmptyDataset())
+  }
+
+  return Response.json(getDemoDataset())
 }

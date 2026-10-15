@@ -17,6 +17,7 @@ import { KpiCards } from './kpi-cards'
 import { ResultsPanel } from './results-panel'
 import { SimulationPanel } from './simulation-panel'
 import { DashboardSkeleton, EmptyState, ErrorState } from './states'
+import { OptimizerPanel } from './optimizer-panel'
 import { formatDay } from '@/lib/ecoloop/format'
 
 function DashboardContent({ dataset }: { dataset: EnergyDataset }) {
@@ -63,6 +64,7 @@ function DashboardContent({ dataset }: { dataset: EnergyDataset }) {
         />
       </div>
       <CampusDigitalTwinMap />
+      <OptimizerPanel />
       <p className="text-xs text-muted-foreground">
         Simulation is a screening-level estimate. Assumptions: $
         {dataset.meta.assumptions.tariffPerKwh.toFixed(2)}/kWh,{' '}

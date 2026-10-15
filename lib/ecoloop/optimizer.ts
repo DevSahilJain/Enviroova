@@ -50,7 +50,7 @@ export const INTERVENTIONS: Intervention[] = [
     buildingId: null,
   },
   {
-    id: 'opt-hvac- economizer',
+    id: 'opt-hvac-economizer',
     name: 'AHU economizer damper repair',
     category: 'HVAC',
     description: 'Fix stuck economizer dampers to use free cooling during mild periods.',
