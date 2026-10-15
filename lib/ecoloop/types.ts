@@ -34,6 +34,35 @@ export interface Hypothesis {
   suggestedCheck: string
 }
 
+export type ConfidenceLabel = 'High' | 'Moderate' | 'Low' | 'Unrated'
+
+export interface ConfidenceComponentScores {
+  /** 0-100 score for presence and quality of required telemetry fields */
+  completeness: number
+  /** 0-100 score based on timestamp recency vs expected interval */
+  freshness: number
+  /** 0-100 score based on mathematical and evidence alignment */
+  consistency: number
+}
+
+export interface SustainabilityConfidenceScore {
+  /** Overall score 0-100, or null if insufficient data to rate */
+  score: number | null
+  label: ConfidenceLabel
+  componentScores: ConfidenceComponentScores
+  missingFields: string[]
+  evidenceUsed: string[]
+  limitations: string[]
+  reasonsForReducedConfidence: string[]
+  /** Measurement certainty that an abnormal energy deviation occurred (0-100) */
+  anomalyDetectionConfidence: number
+  /** Epistemic boundary reminder: diagnoses are hypotheses, not proven physical causes */
+  causalityNotice: string
+  /** Explicitly marks synthetic demonstration data */
+  isSimulated: boolean
+  evaluatedAt: string
+}
+
 export interface Anomaly {
   id: string
   title: string
@@ -48,6 +77,8 @@ export interface Anomaly {
   excessKwh: number
   evidence: EvidenceItem[]
   hypotheses: Hypothesis[]
+  /** Sustainability confidence score assessing data quality, freshness, and evidence consistency */
+  confidenceScore?: SustainabilityConfidenceScore
 }
 
 export interface HvacMeasure {

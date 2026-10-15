@@ -1,3 +1,11 @@
+
+node_modules/
+.next/
+out/
+build/
+coverage/
+.env*
+!.env.example
 # v0 sandbox internal files
 __v0_runtime_loader.js
 __v0_devtools.tsx
