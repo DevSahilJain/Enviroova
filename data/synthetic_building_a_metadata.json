@@ -1,0 +1,293 @@
+{
+  "metadata": {
+    "project": "ECOLOOP - Campus Energy Decarbonization Prototype",
+    "dataset_name": "Synthetic Campus Building Energy Dataset - Building A",
+    "dataset_version": "1.0.0",
+    "data_classification": "SIMULATED_DEMO_DATA",
+    "is_simulated": true,
+    "disclaimer": "CRITICAL NOTICE: All records, readings, baseline profiles, and telemetry entries in this dataset are 100% synthetically generated for the ECOLOOP hackathon prototype. No real campus or DSU facility measurements are represented.",
+    "building_profile": {
+      "building_id": "BUILDING_A",
+      "building_name": "Science & Engineering Hall (Fictional)",
+      "gross_floor_area_sqft": 45000,
+      "occupancy_capacity": 250,
+      "primary_use": "Lecture Halls, Computer Labs, Maker Spaces, Faculty Offices",
+      "hvac_configuration": "Variable Air Volume (VAV) with central AHU-1 & chilled water loop",
+      "energy_units": "kWh (kilowatt-hour)",
+      "time_interval": "Hourly (60 minutes)",
+      "timezone": "UTC (ISO 8601)",
+      "total_readings": 336,
+      "period_covered": "2026-10-01T00:00:00Z to 2026-10-14T23:00:00Z (14 Days)"
+    },
+    "shared_fields": [
+      "building_id",
+      "timestamp",
+      "kwh",
+      "actual_kwh",
+      "expected_kwh",
+      "baseline_kwh",
+      "evidence"
+    ]
+  },
+  "summary_kpis": {
+    "pre_intervention_week": {
+      "dates": "2026-10-01 to 2026-10-07",
+      "total_actual_kwh": 12792.4,
+      "total_baseline_kwh": 11940.0,
+      "anomaly_waste_kwh": 852.4,
+      "anomalies_logged": 3
+    },
+    "post_intervention_week": {
+      "dates": "2026-10-08 to 2026-10-14",
+      "total_baseline_kwh": 11940.0,
+      "total_predicted_kwh": 6860.0,
+      "total_actual_kwh": 6970.8,
+      "predicted_savings_kwh": 5080.0,
+      "predicted_savings_pct": 42.55,
+      "observed_savings_kwh": 4969.2,
+      "observed_savings_pct": 41.62,
+      "model_variance_kwh": -110.8,
+      "model_accuracy_pct": 97.82,
+      "avoided_emissions_kg_co2e": 1913.1,
+      "financial_savings_usd": 596.30
+    }
+  },
+  "anomalies_reference": [
+    {
+      "anomaly_id": "ANOM-01",
+      "type": "HVAC_OFF_HOURS_OVERRUN",
+      "subsystem": "HVAC",
+      "location": "Zone 101 Lecture Hall & Mechanical Room",
+      "reporting_period": {
+        "start_time": "2026-10-02T23:00:00Z",
+        "end_time": "2026-10-03T05:00:00Z",
+        "duration_hours": 7,
+        "integration_interval": "1 hour"
+      },
+      "start_time": "2026-10-02T23:00:00Z",
+      "end_time": "2026-10-03T05:00:00Z",
+      "duration_hours": 7,
+      "excess_energy_kwh": 437.8,
+      "is_simulated": true,
+      "data_classification": "SIMULATED_DEMO_DATA",
+      "observed_facts": [
+        "Sub-meter MTR-HVAC-01 registered continuous 90.2 - 93.8 kW load (expected baseline: 29.8 kW).",
+        "BMS BACnet point AHU1_FAN_SPD_CMD remained at 100% capacity.",
+        "Chilled water circulation pump PMP-CHW-02 ran continuously at 100% duty with supply/return delta-T at 5.8°C.",
+        "Wall thermostat TH-101 registered OVERRIDE_ACTIVE=TRUE with a 18.0°C cooling setpoint.",
+        "Wi-Fi AP client count in Zone 101 remained 0; card access turnstile logged 0 entries.",
+        "Ambient outdoor dry-bulb temperature recorded by campus weather station was 11.9°C to 14.3°C."
+      ],
+      "hypotheses": [
+        {
+          "rank": 1,
+          "hypothesis": "Following an unreserved Friday evening student event, an occupant manually triggered the 18.0°C cooling override on the wall unit, which bypassed the central BMS night setback schedule.",
+          "confidence": "HIGH_LIKELIHOOD"
+        },
+        {
+          "rank": 2,
+          "hypothesis": "A BACnet MS/TP bus communication drop may have prevented the central controller from transmitting the 21:00 scheduled occupancy purge command, latching the AHU in occupied day mode.",
+          "confidence": "MODERATE_ALTERNATIVE"
+        }
+      ],
+      "causality_analysis": {
+        "correlation_note": "A strong temporal correlation exists between the wall thermostat override register and the fan speed spike.",
+        "correlation_vs_causation_caution": "Notice: The concurrent state of 'OVERRIDE_ACTIVE=TRUE' and 100% AHU-1 load demonstrates temporal correlation but does not constitute proof of sole causation. Concurrent mechanical damper stiction, economizer actuator failure, or frozen freeze-stat contacts cannot be excluded without physical diagnostic inspection.",
+        "root_cause_status": "UNVERIFIED_PENDING_PHYSICAL_AUDIT"
+      },
+      "recommendations": [
+        {
+          "type": "SOFTWARE_CONTROL",
+          "action": "Enforce a hard 90-minute auto-reset timeout in the central BMS for all local thermostat overrides."
+        },
+        {
+          "type": "HARDWARE",
+          "action": "Install a lockable physical cover over thermostat TH-101 in Lecture Hall 101 to prevent unauthorized access."
+        },
+        {
+          "type": "OPERATIONAL",
+          "action": "Program an automated midnight sweep routine verifying that chilled water pumps de-energize when outdoor temperature is below 15°C and building occupancy is 0."
+        }
+      ],
+      "source_references": [
+        "MTR-HVAC-01 (Schneider ION9000 Sub-meter)",
+        "BMS-BACNET-GW-01 (Siemens Desigo CC)",
+        "TH-101 (Zone 101 Digital Wall Thermostat)",
+        "AP-ZONE-101-A (Aruba Campus Wi-Fi)",
+        "WS-CAMPUS-01 (Vaisala Outdoor Weather Station)"
+      ],
+      "supporting_evidence_record_ids": [
+        "EVID-ANOM-01-01",
+        "EVID-ANOM-01-02",
+        "EVID-ANOM-01-03",
+        "EVID-ANOM-01-04",
+        "EVID-ANOM-01-05"
+      ],
+      "hypothesis": "Thermostat manual override engaged at 18.0°C in Zone 101 Lecture Hall on Friday evening bypassed central BMS schedule, driving AHU-1 and chilled water circulation pumps at 100% capacity overnight despite 0 occupancy and mild 12-14°C outdoor temperature.",
+      "distinguishable_evidence": "AHU-1 VFD fan command at 100%, chiller pump loop delta-T indicative of full heat rejection, occupancy_count=0, local wall thermostat flag 'OVERRIDE_ACTIVE=TRUE'."
+    },
+    {
+      "anomaly_id": "ANOM-02",
+      "type": "UNOCCUPIED_LIGHTING_OVERNIGHT",
+      "subsystem": "LIGHTING",
+      "location": "Zone 3 Central Atrium & 3rd Floor Classrooms",
+      "reporting_period": {
+        "start_time": "2026-10-04T01:00:00Z",
+        "end_time": "2026-10-04T07:00:00Z",
+        "duration_hours": 7,
+        "integration_interval": "1 hour"
+      },
+      "start_time": "2026-10-04T01:00:00Z",
+      "end_time": "2026-10-04T07:00:00Z",
+      "duration_hours": 7,
+      "excess_energy_kwh": 159.2,
+      "is_simulated": true,
+      "data_classification": "SIMULATED_DEMO_DATA",
+      "observed_facts": [
+        "Branch panel sub-meter MTR-LTG-PNL3 measured flat 22.8 kW consumption for 7 consecutive hours (typical unoccupied baseline is <1.5 kW).",
+        "Relay controller LCP-03 reported relay contactors 1 through 12 in state CLOSED_MANUAL.",
+        "Atrium and 3rd-floor ceiling PIR occupancy sensors logged 0 motion events during the entire interval.",
+        "Electronic access control system logged perimeter security doors as locked/armed since Saturday 22:30."
+      ],
+      "hypotheses": [
+        {
+          "rank": 1,
+          "hypothesis": "Custodial maintenance staff completed weekend floor cleaning at 22:30 Saturday and left the key-operated master override switch turned ON, disabling automated PIR motion timeouts.",
+          "confidence": "HIGH_LIKELIHOOD"
+        },
+        {
+          "rank": 2,
+          "hypothesis": "A lighting contactor coil weld or DALI master controller freeze maintained closed circuit contacts irrespective of occupancy sensor inputs.",
+          "confidence": "MODERATE_ALTERNATIVE"
+        }
+      ],
+      "causality_analysis": {
+        "correlation_note": "A direct temporal coincidence is documented between custodial log-off and continuous panel power draw.",
+        "correlation_vs_causation_caution": "Notice: The documented correlation between custodial exit and constant lighting circuit draw suggests manual override bypass, but controller relay latch failure or upstream DALI gateway lockup cannot be eliminated without physical voltage verification at the panel.",
+        "root_cause_status": "UNVERIFIED_PENDING_PHYSICAL_AUDIT"
+      },
+      "recommendations": [
+        {
+          "type": "SOFTWARE_CONTROL",
+          "action": "Deploy centralized 03:00 automated software lighting sweep to force off-pulse to all non-emergency lighting contactors."
+        },
+        {
+          "type": "HARDWARE",
+          "action": "Replace maintained key switches with spring-return momentary switches that require automated system re-validation every 120 minutes."
+        },
+        {
+          "type": "OPERATIONAL",
+          "action": "Incorporate lighting panel visual verification into custodial end-of-shift checklist."
+        }
+      ],
+      "source_references": [
+        "LCP-03 (Eaton Pow-R-Command Lighting Panel)",
+        "MTR-LTG-PNL3 (Continental Multi-Channel Submeter)",
+        "PIR-ATR-01_THRU_04 (Wattstopper Ceiling Sensors)",
+        "ACS-BLDGA-MAIN (Software House C•CURE 9000 Access Control)"
+      ],
+      "supporting_evidence_record_ids": [
+        "EVID-ANOM-02-01",
+        "EVID-ANOM-02-02",
+        "EVID-ANOM-02-03",
+        "EVID-ANOM-02-04"
+      ],
+      "hypothesis": "Custodial maintenance staff completed weekend floor refinishing at 22:30 Saturday and inadvertently left the key-operated master override switch turned ON, disabling automated PIR motion timeouts and illuminating the entire 3rd-floor lecture hall and main atrium continuously.",
+      "distinguishable_evidence": "Lighting branch sub-meter drawing constant 22.8 kW, occupancy PIR sensor counter reporting zero events, security perimeter armed and doors deadbolted."
+    },
+    {
+      "anomaly_id": "ANOM-03",
+      "type": "AFTER_HOURS_EQUIPMENT_DRAIN",
+      "subsystem": "PLUG_LOAD",
+      "location": "Room 202 (CAD & 3D Simulation Lab)",
+      "reporting_period": {
+        "start_time": "2026-10-05T20:00:00Z",
+        "end_time": "2026-10-06T04:00:00Z",
+        "duration_hours": 9,
+        "integration_interval": "1 hour"
+      },
+      "start_time": "2026-10-05T20:00:00Z",
+      "end_time": "2026-10-06T04:00:00Z",
+      "duration_hours": 9,
+      "excess_energy_kwh": 255.4,
+      "is_simulated": true,
+      "data_classification": "SIMULATED_DEMO_DATA",
+      "observed_facts": [
+        "Dedicated lab distribution panel MTR-PLUG-R202 measured a flat 28.5 kW draw throughout the night.",
+        "Campus Active Directory Domain Controller reported 0 authenticated interactive user sessions on all 40 Room 202 workstations after 19:45.",
+        "Network switch SW-R202-01 port statistics showed Gigabit link-up with baseline packet exchange (~1.2 Mbps) across all 40 workstation ports.",
+        "Lab door RFID badge reader recorded 0 swipe entries after 19:48.",
+        "Smart PDU telemetry logged three 3D printer bed heaters at 60.0°C constant standby."
+      ],
+      "hypotheses": [
+        {
+          "rank": 1,
+          "hypothesis": "Workstation local OS power schemes had sleep timers disabled ('High Performance / Never Sleep'), leaving 40 towers at 200W active idle, alongside 3 3D printer heated beds in unmonitored standby.",
+          "confidence": "HIGH_LIKELIHOOD"
+        },
+        {
+          "rank": 2,
+          "hypothesis": "Background distributed compute tasks (e.g. overnight CAD finite-element rendering or automated OS image deployments) prevented machines from idling down.",
+          "confidence": "MODERATE_ALTERNATIVE"
+        }
+      ],
+      "causality_analysis": {
+        "correlation_note": "Zero user logon count correlates with the empty room condition, while power draw remained at full daytime capacity.",
+        "correlation_vs_causation_caution": "Notice: The absence of active interactive user sessions correlates with workstation idle state, but does not distinguish between unmanaged OS sleep settings versus active background batch rendering processes without inspecting CPU/GPU load telemetry and operating system process tables.",
+        "root_cause_status": "UNVERIFIED_PENDING_PHYSICAL_AUDIT"
+      },
+      "recommendations": [
+        {
+          "type": "SOFTWARE_CONTROL",
+          "action": "Push Active Directory Group Policy Object enforcing 15-minute idle timeout to S3 sleep mode across all lab machines."
+        },
+        {
+          "type": "HARDWARE",
+          "action": "Install smart scheduled relay power strips for lab bench peripherals (3D printers, soldering stations) configured for automatic 20:00 cutoff."
+        },
+        {
+          "type": "OPERATIONAL",
+          "action": "Implement automated night-time wake-on-LAN for software updates, followed by forced sleep command at 02:00."
+        }
+      ],
+      "source_references": [
+        "MTR-PLUG-R202 (Schneider Electric Sub-meter)",
+        "DC-CAMPUS-01 (Active Directory Domain Controller)",
+        "SW-R202-01 (Cisco Catalyst 3850 PoE Switch)",
+        "PDU-3DPRN-01 (APC Switched Rack PDU)",
+        "ACS-R202-READER (HID Signo RFID Door Reader)"
+      ],
+      "supporting_evidence_record_ids": [
+        "EVID-ANOM-03-01",
+        "EVID-ANOM-03-02",
+        "EVID-ANOM-03-03",
+        "EVID-ANOM-03-04"
+      ],
+      "hypothesis": "Students in evening CAD/3D modeling class departed Room 202 at 19:45 without logging out; local workstation power scheme had sleep timers disabled. 40 desktop GPU towers remained at full idle power draw (200W each) alongside 3 3D printer heated beds remaining energized.",
+      "distinguishable_evidence": "Lab 202 dedicated branch panel drawing steady 28.5 kW, zero active network user sessions on campus domain controller, zero keycard badge access events."
+    }
+  ],
+  "interventions_reference": [
+    {
+      "intervention_id": "INT-01",
+      "name": "Automated HVAC Setback & Dynamic Scheduling",
+      "target_subsystem": "HVAC",
+      "weekly_observed_savings_kwh": 2168.4,
+      "mechanism": "Automated BMS schedule programmed with 21:00-06:00 night setback (27.5°C cooling / 15.5°C heating), supply fan clamped to 20% CFM, and local wall thermostat overrides restricted to 90-minute auto-reset."
+    },
+    {
+      "intervention_id": "INT-02",
+      "name": "PIR Occupancy Sweeps & Daylight Dimming",
+      "target_subsystem": "LIGHTING",
+      "weekly_observed_savings_kwh": 1318.2,
+      "mechanism": "15-minute vacancy timeout PIR sensors in classrooms, automated 20:30 centralized lighting sweep, and continuous daylight harvesting photo-sensors along south/east perimeter fenestration."
+    },
+    {
+      "intervention_id": "INT-03",
+      "name": "Centralized Lab Workstation Sleep & Smart Plug Strips",
+      "target_subsystem": "PLUG_LOAD",
+      "weekly_observed_savings_kwh": 1482.6,
+      "mechanism": "Active Directory Group Policy Object enforcing 15-minute idle S3 sleep on all 120 lab PCs, paired with smart scheduled relay strips cutting phantom standby power to peripheral equipment at 20:00 daily."
+    }
+  ]
+}
