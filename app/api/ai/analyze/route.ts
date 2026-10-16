@@ -6,6 +6,15 @@ const REQUEST_TIMEOUT_MS = 30_000
 
 export const dynamic = 'force-dynamic'
 
+function sanitizeProviderError(message: string | undefined): string {
+  if (!message) return 'No error details provided by NVIDIA NIM.'
+  // Strip potential secrets/tokens from provider error messages.
+  return message
+    .replace(/sk-[A-Za-z0-9_\-]{20,}/g, '[REDACTED]')
+    .replace(/Bearer\s+[A-Za-z0-9_\-\.]+/gi, 'Bearer [REDACTED]')
+    .slice(0, 500)
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json()
@@ -33,7 +42,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           error:
-            'AI analyst is not configured. Set NVIDIA_API_KEY on the server to enable it.',
+            'AI analyst is not configured. Add NVIDIA_API_KEY to Vercel environment variables to enable it.',
           configured: false,
         },
         { status: 503 },
@@ -76,17 +85,18 @@ Be concise, practical, and safety-conscious.`
       clearTimeout(timeoutId)
 
       if (!response.ok) {
-        // Do not log or return the upstream body which may contain sensitive info.
         let upstreamMessage = 'Upstream API error.'
         try {
           const errBody = await response.json()
-          upstreamMessage = errBody?.message ?? upstreamMessage
+          upstreamMessage = sanitizeProviderError(
+            errBody?.message ?? errBody?.error ?? upstreamMessage,
+          )
         } catch {
           // ignore parse errors
         }
         return NextResponse.json(
           {
-            error: `NVIDIA NIM request failed (${response.status}).`,
+            error: `NVIDIA NIM request failed (HTTP ${response.status}).`,
             detail: upstreamMessage,
             configured: true,
           },
