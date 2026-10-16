@@ -1,7 +1,7 @@
 'use client'
 
-import { useMemo, useState } from 'react'
-import { Leaf } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { Circle, CircleCheck, Leaf } from 'lucide-react'
 import { DEFAULT_CONFIG, simulate } from '@/lib/ecoloop/simulation'
 import { OPTIMIZER_TARIFF } from '@/lib/ecoloop/optimizer'
 import type {
@@ -20,6 +20,7 @@ import { SimulationPanel } from './simulation-panel'
 import { DashboardSkeleton, EmptyState, ErrorState } from './states'
 import { OptimizerPanel } from './optimizer-panel'
 import { WaterWastePanel } from './water-waste-panel'
+import { AiAnalystPanel } from './ai-analyst-panel'
 import { formatDay } from '@/lib/ecoloop/format'
 
 function DashboardContent({
@@ -35,6 +36,9 @@ function DashboardContent({
   const [selectedAnomalyId, setSelectedAnomalyId] = useState<string | null>(
     dataset.anomalies[0]?.id ?? null,
   )
+
+  const baselineKwh = dataset.series.reduce((s, p) => s + p.expectedKwh, 0)
+  const actualKwh = dataset.series.reduce((s, p) => s + p.actualKwh, 0)
 
   const simulation = useMemo(
     () => simulate(dataset.series, config, { ...dataset.meta.assumptions, tariffPerKwh: tariff }),
@@ -76,6 +80,14 @@ function DashboardContent({
       <CampusDigitalTwinMap />
       <OptimizerPanel tariff={tariff} />
       <WaterWastePanel />
+      <AiAnalystPanel
+        context={{
+          baselineKwh,
+          actualKwh,
+          savingsKwh: simulation.totals.savingsKwh,
+          tariffPerKwh: tariff,
+        }}
+      />
       <p className="text-xs text-muted-foreground">
         Simulation is a screening-level estimate. Assumptions: ₹{' '}
         {tariff.toFixed(2)}/kWh,{' '}
@@ -108,7 +120,18 @@ function DashboardContent({
 export function Dashboard() {
   const [scenario, setScenario] = useState<DemoScenario>('normal')
   const [tariff, setTariff] = useState<number>(OPTIMIZER_TARIFF)
+  const [liveStatus, setLiveStatus] = useState<
+    | { liveProviderConfigured: boolean; connectionVerified: boolean }
+    | null
+  >(null)
   const { data, error, isLoading, mutate } = useEnergyData(scenario)
+
+  useEffect(() => {
+    fetch('/api/energy/status')
+      .then((r) => r.json())
+      .then((json) => setLiveStatus(json as { liveProviderConfigured: boolean; connectionVerified: boolean }))
+      .catch(() => setLiveStatus(null))
+  }, [])
 
   let body: React.ReactNode
   if (isLoading) {
@@ -185,25 +208,36 @@ export function Dashboard() {
             per kWh — affects cost/payback calcs
           </span>
         </div>
-        <div className="flex items-center gap-3">
-          <label htmlFor="dashboard-tariff" className="text-xs text-muted-foreground shrink-0">
-            Tariff (₹/kWh)
-          </label>
-          <input
-            id="dashboard-tariff"
-            type="number"
-            min={0}
-            step={0.1}
-            value={tariff}
-            onChange={(e) => {
-              const v = Number(e.target.value)
-              if (Number.isFinite(v) && v > 0) setTariff(v)
-            }}
-            className="h-7 w-16 rounded-md border bg-background px-2 text-xs focus-visible:outline-2 focus-visible:outline-ring"
-          />
-          <span className="text-xs text-muted-foreground">
-            per kWh — affects cost/payback calcs
-          </span>
+        <div className="flex items-center gap-2">
+          {liveStatus === null ? (
+            <span
+              className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs bg-muted/50 text-muted-foreground border-border"
+            >
+              <Circle className="size-3" aria-hidden="true" />
+              Live data: checking…
+            </span>
+          ) : liveStatus.liveProviderConfigured && liveStatus.connectionVerified ? (
+            <span
+              className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs bg-emerald-500/10 text-emerald-700 border-emerald-500/20"
+            >
+              <CircleCheck className="size-3" aria-hidden="true" />
+              Live data: connected
+            </span>
+          ) : liveStatus.liveProviderConfigured ? (
+            <span
+              className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs bg-amber-500/10 text-amber-700 border-amber-500/20"
+            >
+              <Circle className="size-3" aria-hidden="true" />
+              API key configured — connection not verified
+            </span>
+          ) : (
+            <span
+              className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs bg-muted/50 text-muted-foreground border-border"
+            >
+              <Circle className="size-3" aria-hidden="true" />
+              Demo mode active — no live provider configured
+            </span>
+          )}
         </div>
       </header>
       <main className="mx-auto max-w-[1440px] px-4 py-6 sm:px-6">{body}</main>
