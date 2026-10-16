@@ -283,14 +283,19 @@ export function AnomalyPanel({
                     <div>
                       <div className="mb-1 flex items-center justify-between">
                         <h3 className="font-semibold">
-                          Proposed root-cause hypotheses
+                          Proposed root-cause hypotheses (unverified)
                         </h3>
                         <span className="text-[10px] text-muted-foreground">
-                          Unverified Inferences
+                          Possible causes — not confirmed faults
                         </span>
                       </div>
                       <p className="mb-2 text-[11px] text-muted-foreground italic">
                         {confidence.causalityNotice}
+                      </p>
+                      <p className="mb-2 text-[11px] text-muted-foreground">
+                        Each item below is a <em>possible cause</em> that
+                        requires field investigation. An unusual energy reading
+                        alone cannot confirm a stuck damper or electrical fault.
                       </p>
                       <ol className="space-y-3">
                         {a.hypotheses.map((h) => {
@@ -298,9 +303,11 @@ export function AnomalyPanel({
                           return (
                             <li key={h.cause} className="space-y-1">
                               <div className="flex items-center justify-between gap-3">
-                                <span className="font-medium">{h.cause}</span>
+                                <span className="font-medium">
+                                  Possible cause: {h.cause}
+                                </span>
                                 <span className="tabular-nums text-muted-foreground">
-                                  {pct}%
+                                  {pct}% confidence
                                 </span>
                               </div>
                               <div
@@ -320,7 +327,9 @@ export function AnomalyPanel({
                                 {h.rationale}
                               </p>
                               <p>
-                                <span className="font-medium">Check: </span>
+                                <span className="font-medium">
+                                  Recommended check:
+                                </span>{' '}
                                 {h.suggestedCheck}
                               </p>
                             </li>

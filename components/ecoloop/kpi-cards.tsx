@@ -31,13 +31,13 @@ export function KpiCards({ series, anomalies, simulation }: KpiCardsProps) {
     {
       label: 'Baseline energy',
       value: formatKwh(baseline),
-      detail: 'Expected usage, 7 days',
+      detail: 'Modelled expected usage, 7 days',
       icon: <Gauge className="size-4" aria-hidden="true" />,
     },
     {
       label: 'Actual energy',
       value: formatKwh(actual),
-      detail: `${formatSigned(deltaPct, '%')} vs baseline`,
+      detail: `${formatSigned(deltaPct, '%')} vs baseline — actual usage includes flagged anomalies`,
       icon: <Activity className="size-4" aria-hidden="true" />,
     },
     {
@@ -52,7 +52,7 @@ export function KpiCards({ series, anomalies, simulation }: KpiCardsProps) {
     {
       label: 'Estimated savings',
       value: formatKwh(totals.savingsKwh),
-      detail: `${totals.savingsPct.toFixed(1)}% / ${formatCurrency(totals.costSavings)} (scenario estimate)`,
+      detail: `${totals.savingsPct.toFixed(1)}% / ${formatCurrency(totals.costSavings)} (what-if scenario, independent of actual vs baseline)`,
       icon: <Leaf className="size-4" aria-hidden="true" />,
     },
   ]

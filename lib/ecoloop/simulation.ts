@@ -4,6 +4,7 @@ import type {
   SimulationConfig,
   SimulationResult,
 } from './types'
+import { getISTHour } from './format'
 
 /**
  * Shared what-if simulation module. Pure functions only: no React, no I/O.
@@ -31,7 +32,7 @@ export const MEASURE_UNCERTAINTY = {
 } as const
 
 export const DEFAULT_ASSUMPTIONS: SimulationAssumptions = {
-  tariffPerKwh: 0.12,
+  tariffPerKwh: 6.5,
   emissionFactorKgPerKwh: 0.38,
 }
 
@@ -105,7 +106,7 @@ export function simulate(
   let predictedKwh = 0
 
   const points = series.map((point) => {
-    const h = new Date(point.timestamp).getUTCHours()
+    const h = getISTHour(point.timestamp)
     const { breakdown, occupancy } = point
 
     let hvacSaving = 0

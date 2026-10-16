@@ -4,7 +4,6 @@ import { useMemo, useState } from 'react'
 import {
   Building2,
   Clock,
-  DollarSign,
   Lightbulb,
   Plug,
   ShieldAlert,
@@ -141,9 +140,9 @@ function InterventionRow({
   )
 }
 
-export function OptimizerPanel() {
+export function OptimizerPanel({ tariff = 6.5 }: { tariff?: number }) {
   const [budget, setBudget] = useState(DEFAULT_BUDGET)
-  const result = useMemo(() => optimizeInterventions(budget), [budget])
+  const result = useMemo(() => optimizeInterventions(budget, tariff), [budget, tariff])
 
   const { selected, totalSavingsKwh, totalCost, remainingBudget, paybackYears } =
     result
@@ -174,29 +173,31 @@ export function OptimizerPanel() {
         <section className="rounded-lg border bg-card p-4 sm:p-5">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="flex items-center gap-2">
-              <DollarSign className="size-4 text-muted-foreground shrink-0" aria-hidden="true" />
+              <span className="size-4 text-muted-foreground shrink-0">
+                ₹
+              </span>
               <label htmlFor="optimizer-budget" className="font-medium">
                 Investment budget
               </label>
             </div>
             <div className="flex-1">
               <div className="flex items-end gap-1 text-xs text-muted-foreground">
-                <span>$0</span>
+                <span>₹0</span>
                 <span className="mx-2">—</span>
-                <span>{formatCurrency(100000)}</span>
+                <span>{formatCurrency(10000000)}</span>
               </div>
               <input
                 id="optimizer-budget"
                 type="range"
                 min={0}
-                max={100000}
+                max={10000000}
                 step={1000}
                 value={budget}
                 onChange={(e) => setBudgetSafe(e.target.value)}
                 className="h-5 w-full cursor-pointer accent-amber-500"
               />
               <div className="flex justify-between text-xs font-medium tabular-nums text-primary">
-                <span>$0</span>
+                <span>₹0</span>
                 <span>{formatCurrency(budget)}</span>
               </div>
             </div>
@@ -259,7 +260,7 @@ export function OptimizerPanel() {
         {isInvalid ? (
           <section className="rounded-lg border border-dashed bg-card/30 p-6 text-center text-sm text-muted-foreground">
             <p>
-              Enter a valid budget (0 to {formatCurrency(100000)}) to see
+              Enter a valid budget (0 to {formatCurrency(10000000)}) to see
               recommendations.
             </p>
           </section>

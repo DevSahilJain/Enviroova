@@ -161,7 +161,7 @@ export interface DatasetMeta {
   isSynthetic: boolean
   datasetLabel: string
   siteName: string
-  timezone: 'UTC'
+  timezone: 'IST'
   periodStart: string
   periodEnd: string
   assumptions: SimulationAssumptions
