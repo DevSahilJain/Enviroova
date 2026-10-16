@@ -460,19 +460,33 @@ function BuildingDetailCard({
           <div className="flex items-center justify-between rounded bg-card/30 p-2 border border-border/40 text-sm">
             <span className="text-muted-foreground">Water usage</span>
             <span className="text-[11px] text-muted-foreground italic">
-              Not modeled
+              Simulated estimate
             </span>
           </div>
           <div className="flex items-center justify-between rounded bg-card/30 p-2 border border-border/40 text-sm">
             <span className="text-muted-foreground">Waste generation</span>
             <span className="text-[11px] text-muted-foreground italic">
-              Not modeled
+              Simulated estimate
+            </span>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-2 mt-2">
+          <div className="flex items-center justify-between rounded bg-card/30 p-2 border border-border/40 text-sm">
+            <span className="text-muted-foreground">Water (L/day)</span>
+            <span className="text-[11px] font-medium tabular-nums">
+              {b.currentWaterLpd != null ? `${b.currentWaterLpd.toFixed(0)}` : '—'}
+            </span>
+          </div>
+          <div className="flex items-center justify-between rounded bg-card/30 p-2 border border-border/40 text-sm">
+            <span className="text-muted-foreground">Waste (kg/day)</span>
+            <span className="text-[11px] font-medium tabular-nums">
+              {b.currentWasteKgpd != null ? `${b.currentWasteKgpd.toFixed(1)}` : '—'}
             </span>
           </div>
         </div>
         <p className="mt-1 text-[11px] text-muted-foreground">
-          Water and waste data are not part of the current building model, so
-          no values are shown. All electricity figures are{' '}
+          Water and waste figures are simulated estimates for demonstration,
+          not live sensor readings. All electricity figures are{' '}
           <span style={{ color: '#FFBF00', fontWeight: 600 }}>
             simulated estimates
           </span>{' '}

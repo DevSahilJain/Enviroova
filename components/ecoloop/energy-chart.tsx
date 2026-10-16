@@ -78,7 +78,7 @@ function ChartTooltip({
   return (
     <div className="rounded-lg border bg-popover px-3 py-2 text-xs shadow-md">
       <p className="mb-1 font-medium">
-        {formatDateTime(new Date(row.t).toISOString())} UTC
+        {formatDateTime(new Date(row.t).toISOString())} IST
       </p>
       <dl className="space-y-0.5 tabular-nums">
         <div className="flex justify-between gap-6">
@@ -148,7 +148,11 @@ export function EnergyChart({
   const dayTicks = useMemo(
     () =>
       data
-        .filter((row) => new Date(row.t).getUTCHours() === 0)
+        .filter((row) => {
+          const d = new Date(row.t)
+          // IST midnight check: UTC hour 18:30+ maps to IST hour 0
+          return d.getUTCHours() === 18 && d.getUTCMinutes() >= 30
+        })
         .map((row) => row.t),
     [data],
   )
@@ -158,7 +162,7 @@ export function EnergyChart({
   return (
     <Panel
       title="Energy consumption"
-      description="Expected versus actual hourly usage (kWh), 7 days, UTC"
+      description="Expected versus actual hourly usage (kWh), 7 days, IST"
       actions={
         <div
           role="group"
@@ -331,7 +335,7 @@ export function EnergyChart({
             <thead>
               <tr className="border-b text-left text-xs text-muted-foreground">
                 <th scope="col" className="py-2 pr-4 font-medium">
-                  Day (UTC)
+                  Day (IST)
                 </th>
                 <th scope="col" className="py-2 pr-4 text-right font-medium">
                   Expected

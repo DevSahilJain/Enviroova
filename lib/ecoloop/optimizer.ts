@@ -5,7 +5,7 @@ export interface Intervention {
   description: string
   /** Estimated annual energy savings, kWh */
   estimatedSavingsKwh: number
-  /** Implementation cost, USD */
+  /** Implementation cost, INR */
   cost: number
   /** Payback period, years */
   paybackYears: number
@@ -22,8 +22,8 @@ export const INTERVENTIONS: Intervention[] = [
     category: 'Lighting',
     description: 'Replace fluorescent and halogen fixtures with LED across low-usage corridors and labs.',
     estimatedSavingsKwh: 18400,
-    cost: 24000,
-    paybackYears: 1.6,
+    cost: 300000,
+    paybackYears: 2.5,
     difficulty: 2,
     buildingId: null,
   },
@@ -33,8 +33,8 @@ export const INTERVENTIONS: Intervention[] = [
     category: 'HVAC',
     description: 'Program setback windows to match actual occupancy; no capital cost.',
     estimatedSavingsKwh: 22800,
-    cost: 4000,
-    paybackYears: 0.2,
+    cost: 50000,
+    paybackYears: 0.3,
     difficulty: 1,
     buildingId: null,
   },
@@ -44,8 +44,8 @@ export const INTERVENTIONS: Intervention[] = [
     category: 'Equipment',
     description: 'Smart relays switch off lab and office plug loads outside occupied hours.',
     estimatedSavingsKwh: 12600,
-    cost: 18000,
-    paybackYears: 1.7,
+    cost: 250000,
+    paybackYears: 3.0,
     difficulty: 3,
     buildingId: null,
   },
@@ -55,8 +55,8 @@ export const INTERVENTIONS: Intervention[] = [
     category: 'HVAC',
     description: 'Fix stuck economizer dampers to use free cooling during mild periods.',
     estimatedSavingsKwh: 15200,
-    cost: 11000,
-    paybackYears: 0.9,
+    cost: 150000,
+    paybackYears: 1.5,
     difficulty: 3,
     buildingId: 'science-complex',
   },
@@ -66,8 +66,8 @@ export const INTERVENTIONS: Intervention[] = [
     category: 'Lighting',
     description: 'Add occupancy sensors to classrooms and meeting rooms.',
     estimatedSavingsKwh: 9400,
-    cost: 14000,
-    paybackYears: 1.8,
+    cost: 200000,
+    paybackYears: 3.3,
     difficulty: 2,
     buildingId: null,
   },
@@ -77,8 +77,8 @@ export const INTERVENTIONS: Intervention[] = [
     category: 'HVAC',
     description: 'Retune setpoints and schedules across the central plant.',
     estimatedSavingsKwh: 19800,
-    cost: 32000,
-    paybackYears: 2.0,
+    cost: 400000,
+    paybackYears: 3.1,
     difficulty: 4,
     buildingId: null,
   },
@@ -88,8 +88,8 @@ export const INTERVENTIONS: Intervention[] = [
     category: 'Envelope',
     description: 'Seal gaps around window frames and improve perimeter insulation.',
     estimatedSavingsKwh: 6200,
-    cost: 9000,
-    paybackYears: 1.8,
+    cost: 120000,
+    paybackYears: 3.0,
     difficulty: 2,
     buildingId: 'north-dorms',
   },
@@ -99,16 +99,16 @@ export const INTERVENTIONS: Intervention[] = [
     category: 'HVAC',
     description: 'Replace aging split systems with variable-refrigerant-flow units.',
     estimatedSavingsKwh: 31000,
-    cost: 95000,
-    paybackYears: 3.7,
+    cost: 1200000,
+    paybackYears: 6.0,
     difficulty: 5,
     buildingId: 'sports-arena',
   },
 ]
 
-export const BUDGET_OPTIONS = [10000, 25000, 50000, 75000, 100000]
+export const BUDGET_OPTIONS = [500000, 1000000, 2000000, 3000000, 4000000]
 
-export const DEFAULT_BUDGET = 50000
+export const DEFAULT_BUDGET = 2000000
 
 export interface OptimizerResult {
   selected: Intervention[]
@@ -118,11 +118,14 @@ export interface OptimizerResult {
   paybackYears: number
 }
 
-/** Tariff used to convert annual kWh savings into dollar savings. */
-const OPTIMIZER_TARIFF = 0.12
+/** Tariff used to convert annual kWh savings into rupee savings. Default ₹6.50/kWh. */
+export const OPTIMIZER_TARIFF = 6.5
 
-/** Greedy knapsack by best savings-per-dollar, respecting budget. */
-export function optimizeInterventions(budget: number): OptimizerResult {
+/** Greedy knapsack by best savings-per-rupee, respecting budget. */
+export function optimizeInterventions(
+  budget: number,
+  tariff: number = OPTIMIZER_TARIFF,
+): OptimizerResult {
   const sorted = [...INTERVENTIONS].sort(
     (a, b) => b.estimatedSavingsKwh / b.cost - a.estimatedSavingsKwh / a.cost,
   )
@@ -136,7 +139,7 @@ export function optimizeInterventions(budget: number): OptimizerResult {
       totalCost += item.cost
     }
   }
-  const annualSavings = totalSavingsKwh * OPTIMIZER_TARIFF
+  const annualSavings = totalSavingsKwh * tariff
   return {
     selected,
     totalSavingsKwh,
@@ -147,10 +150,10 @@ export function optimizeInterventions(budget: number): OptimizerResult {
 }
 
 export function formatCurrency(value: number): string {
-  if (!Number.isFinite(value)) return '—'
-  return new Intl.NumberFormat('en-US', {
+  if (!Number.isFinite(value)) return '₹—'
+  return new Intl.NumberFormat('en-IN', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'INR',
     maximumFractionDigits: value >= 1000 ? 0 : 2,
   }).format(value)
 }

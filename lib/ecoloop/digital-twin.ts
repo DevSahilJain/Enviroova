@@ -27,6 +27,14 @@ export interface CampusBuilding {
   currentKw: number
   /** Baseline kW draw */
   baselineKw: number
+  /** Current water usage, litres/day */
+  currentWaterLpd?: number
+  /** Baseline water usage, litres/day */
+  baselineWaterLpd?: number
+  /** Current waste generation, kg/day */
+  currentWasteKgpd?: number
+  /** Baseline waste generation, kg/day */
+  baselineWasteKgpd?: number
   /** Short status label */
   status: 'Normal' | 'Elevated' | 'Critical Anomaly'
 }
@@ -41,6 +49,10 @@ export const CAMPUS_BUILDINGS: CampusBuilding[] = [
     category: 'Academic',
     currentKw: 284.5,
     baselineKw: 215.0,
+    currentWaterLpd: 450,
+    baselineWaterLpd: 320,
+    currentWasteKgpd: 24.5,
+    baselineWasteKgpd: 18.0,
     status: 'Critical Anomaly',
   },
   {
@@ -52,6 +64,10 @@ export const CAMPUS_BUILDINGS: CampusBuilding[] = [
     category: 'Library',
     currentKw: 172.0,
     baselineKw: 110.0,
+    currentWaterLpd: 280,
+    baselineWaterLpd: 200,
+    currentWasteKgpd: 15.2,
+    baselineWasteKgpd: 12.0,
     status: 'Critical Anomaly',
   },
   {
@@ -63,6 +79,10 @@ export const CAMPUS_BUILDINGS: CampusBuilding[] = [
     category: 'Academic',
     currentKw: 138.2,
     baselineKw: 125.0,
+    currentWaterLpd: 120,
+    baselineWaterLpd: 110,
+    currentWasteKgpd: 8.5,
+    baselineWasteKgpd: 7.0,
     status: 'Elevated',
   },
   {
@@ -74,6 +94,10 @@ export const CAMPUS_BUILDINGS: CampusBuilding[] = [
     category: 'Dining',
     currentKw: 104.0,
     baselineKw: 98.0,
+    currentWaterLpd: 680,
+    baselineWaterLpd: 600,
+    currentWasteKgpd: 42.0,
+    baselineWasteKgpd: 35.0,
     status: 'Normal',
   },
   {
@@ -86,6 +110,10 @@ export const CAMPUS_BUILDINGS: CampusBuilding[] = [
     category: 'Residential',
     currentKw: 145.8,
     baselineKw: 140.0,
+    currentWaterLpd: 520,
+    baselineWaterLpd: 480,
+    currentWasteKgpd: 28.0,
+    baselineWasteKgpd: 25.0,
     status: 'Normal',
   },
   {
@@ -97,6 +125,10 @@ export const CAMPUS_BUILDINGS: CampusBuilding[] = [
     category: 'Recreation',
     currentKw: 92.4,
     baselineKw: 88.0,
+    currentWaterLpd: 310,
+    baselineWaterLpd: 290,
+    currentWasteKgpd: 16.5,
+    baselineWasteKgpd: 14.0,
     status: 'Normal',
   },
 ]

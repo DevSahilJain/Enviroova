@@ -116,7 +116,7 @@ function HourRange({
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label htmlFor={startId} className="sr-only">
-            {label} start hour (UTC)
+            {label} start hour (IST)
           </label>
           <select
             id={startId}
@@ -133,7 +133,7 @@ function HourRange({
         </div>
         <div>
           <label htmlFor={endId} className="sr-only">
-            {label} end hour (UTC)
+            {label} end hour (IST)
           </label>
           <select
             id={endId}
@@ -235,7 +235,7 @@ export function SimulationPanel({ config, onChange }: SimulationPanelProps) {
             }
           />
           <HourRange
-            label="Setback window (UTC)"
+            label="Setback window (IST)"
             start={hvac.startHour}
             end={hvac.endHour}
             disabled={!hvac.enabled}
@@ -290,7 +290,7 @@ export function SimulationPanel({ config, onChange }: SimulationPanelProps) {
             }
           />
           <HourRange
-            label="Shutdown window (UTC)"
+            label="Shutdown window (IST)"
             start={equipment.startHour}
             end={equipment.endHour}
             disabled={!equipment.enabled}

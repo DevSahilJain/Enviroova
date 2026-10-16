@@ -1,5 +1,6 @@
 import { computeSustainabilityConfidenceScore } from './confidence-score'
 import { DEFAULT_ASSUMPTIONS, DISABLED_CONFIG, simulate } from './simulation'
+import { getISTHour, getISTDay } from './format'
 import type {
   Anomaly,
   AnomalySeverity,
@@ -18,7 +19,7 @@ import type {
  */
 
 const HOURS = 24 * 7
-const START_MS = Date.UTC(2026, 9, 8, 0, 0, 0) // Thu 8 Oct 2026, 00:00 UTC
+const START_MS = Date.UTC(2026, 9, 7, 18, 30, 0) // Thu 8 Oct 2026, 00:00 IST (18:30 UTC on 7 Oct)
 const HOUR_MS = 3_600_000
 const SOURCE = 'Synthetic demo meter'
 
@@ -53,7 +54,7 @@ const INJECTED: InjectedAnomaly[] = [
   {
     id: 'anom-hvac-overnight',
     title: 'Overnight HVAC load well above schedule',
-    startHourIndex: 24 + 22, // Fri 9 Oct 22:00 UTC
+    startHourIndex: 24 + 22, // Fri 9 Oct 22:00 IST
     durationHours: 6,
     extraKwh: 38,
     severity: 'high',
@@ -91,7 +92,7 @@ const INJECTED: InjectedAnomaly[] = [
   {
     id: 'anom-equip-weekend',
     title: 'Weekend equipment draw during low occupancy',
-    startHourIndex: 72 + 13, // Sun 11 Oct 13:00 UTC
+    startHourIndex: 72 + 13, // Sun 11 Oct 13:00 IST
     durationHours: 4,
     extraKwh: 24,
     severity: 'medium',
@@ -122,7 +123,7 @@ const INJECTED: InjectedAnomaly[] = [
   {
     id: 'anom-lighting-night',
     title: 'Pre-dawn lighting load on a weekday',
-    startHourIndex: 120 + 2, // Tue 13 Oct 02:00 UTC
+    startHourIndex: 120 + 2, // Tue 13 Oct 02:00 IST
     durationHours: 3,
     extraKwh: 14,
     severity: 'low',
@@ -153,8 +154,7 @@ const INJECTED: InjectedAnomaly[] = [
 ]
 
 function isWeekday(ms: number) {
-  const day = new Date(ms).getUTCDay()
-  return day !== 0 && day !== 6
+  return getISTDay(ms) !== 0 && getISTDay(ms) !== 6
 }
 
 function round(value: number, digits = 1) {
@@ -176,7 +176,7 @@ function buildSeries() {
   const series: EnergyPoint[] = []
   for (let i = 0; i < HOURS; i++) {
     const ms = START_MS + i * HOUR_MS
-    const h = new Date(ms).getUTCHours()
+    const h = getISTHour(new Date(ms).toISOString())
     const weekday = isWeekday(ms)
     const occupancy = round(
       weekday ? WEEKDAY_OCCUPANCY[h] : WEEKDAY_OCCUPANCY[h] * 0.2,
@@ -219,11 +219,11 @@ function buildSeries() {
 }
 
 const fmtClock = (iso: string) =>
-  new Date(iso).toLocaleTimeString('en-US', {
+  new Date(iso).toLocaleTimeString('en-IN', {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
-    timeZone: 'UTC',
+    timeZone: 'Asia/Kolkata',
   })
 
 function buildAnomalies(series: EnergyPoint[]): Anomaly[] {
@@ -352,7 +352,7 @@ export function getDemoDataset(): EnergyDataset {
       isSynthetic: true,
       datasetLabel: 'Synthetic demonstration data',
       siteName: 'Demo academic building (fictional)',
-      timezone: 'UTC',
+      timezone: 'IST',
       periodStart: series[0].timestamp,
       periodEnd: series[series.length - 1].timestamp,
       assumptions: DEFAULT_ASSUMPTIONS,
