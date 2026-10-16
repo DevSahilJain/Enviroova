@@ -2,25 +2,52 @@ import { NextResponse } from 'next/server'
 
 const NVIDIA_BASE_URL = 'https://integrate.api.nvidia.com/v1'
 const MAX_MESSAGE_LENGTH = 1000
-const REQUEST_TIMEOUT_MS = 30_000
+const REQUEST_TIMEOUT_MS = 25_000
+const MAX_OUTPUT_TOKENS = 250
 
 export const dynamic = 'force-dynamic'
 
 function sanitizeProviderError(message: string | undefined): string {
   if (!message) return 'No error details provided by NVIDIA NIM.'
-  // Strip potential secrets/tokens from provider error messages.
   return message
     .replace(/sk-[A-Za-z0-9_\-]{20,}/g, '[REDACTED]')
     .replace(/Bearer\s+[A-Za-z0-9_\-\.]+/gi, 'Bearer [REDACTED]')
     .slice(0, 500)
 }
 
+function statusError(status: number): { error: string; detail?: string } {
+  switch (status) {
+    case 401:
+    case 403:
+      return {
+        error: 'NVIDIA API key is invalid or expired.',
+        detail: 'Verify NVIDIA_API_KEY in Vercel environment variables.',
+      }
+    case 429:
+      return {
+        error: 'NVIDIA NIM rate limit exceeded.',
+        detail: 'Wait a moment and try again.',
+      }
+    case 500:
+    case 502:
+    case 503:
+    case 504:
+      return {
+        error: `NVIDIA NIM server error (HTTP ${status}).`,
+        detail: 'Please try again later.',
+      }
+    default:
+      return { error: `NVIDIA NIM request failed (HTTP ${status}).` }
+  }
+}
+
 export async function POST(request: Request) {
+  const startTime = Date.now()
+
   try {
     const body = await request.json()
     const { message } = body as { message?: string }
 
-    // Validate input
     if (typeof message !== 'string' || message.trim().length === 0) {
       return NextResponse.json(
         { error: 'Message is required.' },
@@ -49,15 +76,11 @@ export async function POST(request: Request) {
       )
     }
 
-    // Build system prompt that grounds the assistant in sustainability context
-    // and explicitly frames data as simulated/demo when applicable.
     const systemPrompt = `You are an AI Sustainability Analyst for a campus energy dashboard (DSU).
-You provide practical, high-level sustainability suggestions based on the user's question.
-You do NOT have access to live meter readings unless they are explicitly included in the conversation context below.
-All dashboard figures shown in this demo are simulated demonstration data, not real measurements.
-Never claim AI suggestions are verified measurements, actual campus findings, or engineering-grade advice.
-Always recommend field verification and professional audit before acting on suggestions.
-Be concise, practical, and safety-conscious.`
+All dashboard figures are simulated demonstration data, not real measurements.
+Provide practical, high-level sustainability suggestions. Never claim AI suggestions are verified measurements or actual campus findings.
+Recommend field verification and professional audit before acting.
+Be concise.`
 
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
@@ -76,13 +99,14 @@ Be concise, practical, and safety-conscious.`
             { role: 'user', content: message },
           ],
           temperature: 0.5,
-          max_tokens: 500,
+          max_tokens: MAX_OUTPUT_TOKENS,
           stream: false,
         }),
         signal: controller.signal,
       })
 
       clearTimeout(timeoutId)
+      const durationMs = Date.now() - startTime
 
       if (!response.ok) {
         let upstreamMessage = 'Upstream API error.'
@@ -94,10 +118,12 @@ Be concise, practical, and safety-conscious.`
         } catch {
           // ignore parse errors
         }
+        const mapped = statusError(response.status)
         return NextResponse.json(
           {
-            error: `NVIDIA NIM request failed (HTTP ${response.status}).`,
-            detail: upstreamMessage,
+            error: mapped.error,
+            detail: mapped.detail ?? upstreamMessage,
+            durationMs,
             configured: true,
           },
           { status: 502 },
@@ -112,18 +138,29 @@ Be concise, practical, and safety-conscious.`
       return NextResponse.json({
         reply: content,
         model,
+        durationMs,
         configured: true,
       })
     } catch (err) {
       clearTimeout(timeoutId)
+      const durationMs = Date.now() - startTime
       if (err instanceof Error && err.name === 'AbortError') {
         return NextResponse.json(
-          { error: 'AI analyst request timed out. Please try again.', configured: true },
+          {
+            error: 'AI analyst request timed out. Please try again.',
+            detail: `No response from NVIDIA NIM within ${REQUEST_TIMEOUT_MS / 1000}s.`,
+            durationMs,
+            configured: true,
+          },
           { status: 504 },
         )
       }
       return NextResponse.json(
-        { error: 'AI analyst request failed.', configured: true },
+        {
+          error: 'AI analyst request failed.',
+          durationMs,
+          configured: true,
+        },
         { status: 500 },
       )
     }

@@ -22,6 +22,7 @@ interface Message {
 }
 
 const MAX_MESSAGE_LENGTH = 1000
+const FETCH_TIMEOUT_MS = 20_000
 
 export function AiAnalystPanel({
   context,
@@ -30,7 +31,10 @@ export function AiAnalystPanel({
   const [messages, setMessages] = useState<Message[]>([])
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle')
   const [errorMessage, setErrorMessage] = useState('')
+  const [lastUserMessage, setLastUserMessage] = useState('')
   const inputRef = useRef<HTMLInputElement | null>(null)
+  const abortRef = useRef<AbortController | null>(null)
+  const isSubmittingRef = useRef(false)
 
   const buildContextString = useCallback(() => {
     if (!context) {
@@ -53,13 +57,24 @@ export function AiAnalystPanel({
     return parts.join('. ') + '.'
   }, [context])
 
+  const abortCurrent = useCallback(() => {
+    if (abortRef.current) {
+      abortRef.current.abort()
+      abortRef.current = null
+    }
+    isSubmittingRef.current = false
+  }, [])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const trimmed = input.trim()
-    if (!trimmed || status === 'loading') return
+    if (!trimmed || status === 'loading' || isSubmittingRef.current) return
+
+    abortCurrent()
 
     const userMessage: Message = { role: 'user', content: trimmed }
     setMessages((prev) => [...prev, userMessage])
+    setLastUserMessage(trimmed)
     setInput('')
     setStatus('loading')
     setErrorMessage('')
@@ -67,12 +82,22 @@ export function AiAnalystPanel({
     const contextString = buildContextString()
     const fullMessage = `${trimmed}\n\nDashboard context (simulated/demo data unless noted otherwise): ${contextString}`
 
+    const controller = new AbortController()
+    abortRef.current = controller
+    isSubmittingRef.current = true
+
+    const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
+
     try {
       const response = await fetch('/api/ai/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: fullMessage }),
+        signal: controller.signal,
       })
+
+      clearTimeout(timeoutId)
+      abortRef.current = null
 
       if (!response.ok) {
         let detail = ''
@@ -82,7 +107,15 @@ export function AiAnalystPanel({
         } catch {
           // ignore parse errors
         }
-        throw new Error(detail || `Server returned ${response.status}`)
+        const userFriendly =
+          response.status === 429
+            ? 'AI service is rate-limited. Please wait and try again.'
+            : response.status === 401 || response.status === 403
+              ? 'AI service authentication failed. Please contact support.'
+              : response.status === 504
+                ? 'AI service timed out. Please try again.'
+                : detail || `Server returned ${response.status}`
+        throw new Error(userFriendly)
       }
 
       const data = await response.json()
@@ -92,17 +125,91 @@ export function AiAnalystPanel({
       }
       setMessages((prev) => [...prev, assistantMessage])
       setStatus('idle')
+      isSubmittingRef.current = false
     } catch (err) {
-      const msg =
-        err instanceof Error ? err.message : 'AI analyst request failed.'
-      setErrorMessage(msg)
+      clearTimeout(timeoutId)
+      abortRef.current = null
+      isSubmittingRef.current = false
+
+      if (err instanceof Error && err.name === 'AbortError') {
+        setErrorMessage('AI analyst request timed out. Please try again.')
+      } else {
+        setErrorMessage(
+          err instanceof Error ? err.message : 'AI analyst request failed.',
+        )
+      }
       setStatus('error')
     }
   }
 
   const handleRetry = () => {
-    setStatus('idle')
+    if (!lastUserMessage) return
+    setStatus('loading')
     setErrorMessage('')
+    const e = {
+      preventDefault: () => {},
+    } as unknown as React.FormEvent
+    // Re-submit the last user message
+    const trimmed = lastUserMessage.trim()
+    if (!trimmed || isSubmittingRef.current) return
+
+    abortCurrent()
+
+    setMessages((prev) => [...prev, { role: 'user', content: trimmed }])
+    setStatus('loading')
+
+    const contextString = buildContextString()
+    const fullMessage = `${trimmed}\n\nDashboard context (simulated/demo data unless noted otherwise): ${contextString}`
+
+    const controller = new AbortController()
+    abortRef.current = controller
+    isSubmittingRef.current = true
+
+    const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
+
+    fetch('/api/ai/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: fullMessage }),
+      signal: controller.signal,
+    })
+      .then((response) => {
+        clearTimeout(timeoutId)
+        abortRef.current = null
+        if (!response.ok) {
+          return response.json().then((err) => {
+            throw new Error(
+              err?.detail ?? err?.error ?? `Server returned ${response.status}`,
+            )
+          })
+        }
+        return response.json()
+      })
+      .then((data) => {
+        abortRef.current = null
+        isSubmittingRef.current = false
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            content: data?.reply ?? 'No response from AI analyst.',
+          },
+        ])
+        setStatus('idle')
+      })
+      .catch((err) => {
+        clearTimeout(timeoutId)
+        abortRef.current = null
+        isSubmittingRef.current = false
+        if (err instanceof Error && err.name === 'AbortError') {
+          setErrorMessage('AI analyst request timed out. Please try again.')
+        } else {
+          setErrorMessage(
+            err instanceof Error ? err.message : 'AI analyst request failed.',
+          )
+        }
+        setStatus('error')
+      })
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -187,7 +294,7 @@ export function AiAnalystPanel({
             value={input}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            disabled={status === 'loading'}
+            disabled={status === 'loading' || isSubmittingRef.current}
             placeholder="Ask about energy savings, water, waste…"
             className={cn(
               'w-full rounded-md border bg-background px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-60',
@@ -196,7 +303,7 @@ export function AiAnalystPanel({
           />
           <Button
             type="submit"
-            disabled={!input.trim() || status === 'loading'}
+            disabled={!input.trim() || status === 'loading' || isSubmittingRef.current}
             size="sm"
             className="absolute right-1 top-1"
           >
