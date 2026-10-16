@@ -1,4 +1,4 @@
-# ECOLOOP — Campus Energy Intelligence & Decarbonization
+# Enviroova — Campus Energy Intelligence & Decarbonization
 
 > **College Hackathon Prototype**  
 > *Data & Sustainability Analysis Component*
@@ -14,7 +14,7 @@
 ---
 
 ## Project Overview
-**ECOLOOP** is an intelligent campus energy decarbonization platform designed to detect building energy anomalies, prescribe automated operational interventions, and verify energy and carbon savings using measurement and verification (M&V) best practices.
+**Enviroova** is an intelligent campus energy decarbonization platform designed to detect building energy anomalies, prescribe automated operational interventions, and verify energy and carbon savings using measurement and verification (M&V) best practices.
 
 This repository contains the **curated synthetic campus energy dataset** for fictional **Building A (Science & Engineering Hall)**, covering a 14-day observation period (336 hourly readings) with pre-intervention anomaly modeling and post-intervention optimization verification.
 
