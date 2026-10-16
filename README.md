@@ -6,10 +6,10 @@
 ---
 
 ## Team Members
-* **Jeet Kotadiya**
-* **Kislay Agarwal**
-* **Vedant Jain**
-* **Sahil Jain**
+* **Jeet Kotadiya** - backend
+* **Kislay Agarwal** - testing
+* **Vedant Jain** - frontend
+* **Sahil Jain** - integration
 
 ---
 
