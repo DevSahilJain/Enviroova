@@ -10,7 +10,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'ECOLOOP | Campus energy sustainability dashboard',
+  title: 'Enviroova | Campus energy sustainability dashboard',
   description:
     'Monitor campus energy, investigate anomalies, simulate interventions and verify savings. Demonstration build using synthetic data.',
 }

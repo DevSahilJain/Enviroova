@@ -114,7 +114,7 @@ export function Dashboard() {
             </span>
             <div>
               <h1 className="text-lg leading-tight font-semibold tracking-tight">
-                ECOLOOP
+                Enviroova
               </h1>
               <p className="text-xs text-muted-foreground">
                 Campus energy sustainability

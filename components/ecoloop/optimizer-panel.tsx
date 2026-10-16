@@ -247,7 +247,7 @@ export function OptimizerPanel() {
               </p>
               <p className="text-xs text-amber-700">
                 Savings, cost, and payback figures are model-based estimates
-                from the ECOLOOP sustainability engine, not live campus meter
+                from the Enviroova sustainability engine, not live campus meter
                 readings. Use them to prioritize interventions, not as
                 guaranteed outcomes.
               </p>
